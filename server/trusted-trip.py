@@ -23,10 +23,22 @@ dispatcher_url = environ["HTTP_DISPATCHER_URL"]
 app.logger.info(f"HTTP dispatcher url is {dispatcher_url}")
 
 
-def isInTheTollZone(gps_data):
+def is_in_the_toll_zone(gps_data):
     print("Latitude: " + gps_data[2])
     print("Longtitude: " + gps_data[4])
     return random.randint(0, 1) == 1
+
+
+def call_back_to_rollup(result):
+    result = "0x" + result.encode().hex()
+    print("result in hex")
+    print(result)
+    print("Adding notice")
+    response = requests.post(dispatcher_url + "/notice", json={"payload": result})
+    print(f"Received notice status {response.status_code} body {response.json()}")
+    print("Finishing")
+    response = requests.post(dispatcher_url + "/finish", json={"status": "accept"})
+    print(f"Received finish status {response.status_code}")
 
 
 @app.route('/advance', methods=['POST'])
@@ -37,8 +49,12 @@ def advance():
     data = bytes.fromhex(body["payload"][2:])
     data = data.decode().split(",")
     print(data)
+    if len(data) != 15:
+        result = "Invalid GPS data"
+        call_back_to_rollup(result)
+        return "", 202
 
-    is_toll_zone = isInTheTollZone(data)
+    is_toll_zone = is_in_the_toll_zone(data)
 
     if is_toll_zone:
         result = "You are in the toll zone. You need to pay the fee!!!"
@@ -46,16 +62,8 @@ def advance():
         result = "You are good"
 
     print(result)
-    result = "0x" + result.encode().hex()
-    print("result in hex")
-    print(result)
-    print("Adding notice")
-    response = requests.post(dispatcher_url + "/notice", json={"payload": result})
-    print(f"Received notice status {response.status_code} body {response.json()}")
-    print("Finishing")
-    response = requests.post(dispatcher_url + "/finish", json={"status": "accept"})
-    print(f"Received finish status {response.status_code}")
-    return "abc", 202
+    call_back_to_rollup(result)
+    return "", 202
 
 
 @app.route('/inspect', methods=['GET'])
