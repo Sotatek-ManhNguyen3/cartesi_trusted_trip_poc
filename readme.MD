@@ -1,39 +1,8 @@
-This is Trusted trip poc example
+## Trusted Trip POC DApp 
 
-## How this example works
-GPS data processing PoC in partnership with IoTeX, assuming that given GPS data input is trustworthy.</br>
-Concept:
+This example will define 2 kind of zones in map : Inner Safety Zone and Runaway Protection Zone and notice users when they enter the zone which requires charging fee.
 
-- Trusted vehicle “real-time” GPS data is sent as inputs and cross-referenced against public map datasets
-- If at any time the vehicle enters a toll zone or congestion zone, a notice is issued billing the vehicle owner for tolls
-
-
-The GPS data will use the format based on GPGGA (Global Positioning System Fix Data (Time, Position, Elevation))
-
-GPGGA is a commonplace format specified by the National Marine Electronics Association (NMEA. In addition to GPS receivers, it’s also used by echo sounder, sonars, anemometer, gyrocompass, and autopilot devices.)
-
-Example: `$GPGGA,170241.00,3401.21189,N,11824.67797,W,1,06,2.14,71.6,M,-32.9,M,,*57`
-
-Field Description:
-
-| Position | Field name                                         | Example data | Description                                                       |
-|----------|----------------------------------------------------|--------------|-------------------------------------------------------------------|
-| 0        | Sentence Type Identifier                           | $GPGGA       | GGA protocol header                                               |
-| 1        | Time                                               | 170241       | 17:02:41 UTC                                                      |
-| 2        | Latitude                                           | 3401.21189   | ddmm.mmmm format, converts to 34.020196 or 34d 1' 12.706" N       |
-| 3        | Latitude Hemisphere                                | N            | N = North, S = South                                              |
-| 4        | Longitude                                          | 11824.67797  | dddmm.mmmm format, converts to -118.41129833 or 118d 24' 48673" W |
-| 5        | Longitude Hemisphere                               | W            | W = West, E = East                                                |
-| 6        | - 0 = Invalid</br>- 1 = GPS fix</br>- 2 = DGPS fix | 1            | Data is from a GPS fix                                            |
-| 7        | Number of Satellites                               | 6            | 6 Satellites are in view                                          |
-| 8        | Horizontal Dilution of Precision (HDOP)            | 2.14         | Relative accuracy of horizontal position                          |
-| 9        | Altitude                                           | 71.6         | 71.6 meters above mean sea level                                  |
-| 10       | Altitude Units                                     | M            | M = meters                                                        |
-| 11       | Height of geoid above WGS84 ellipsoid              | -32.9        | -32.9 meters                                                      |
-| 12       | Height of geoid above WGS84 ellipsoid Units        | M            | M = meters                                                        |
-| 13       | Time since last DGPS update                        | blank        | No last update                                                    |
-| 14       | DGPS reference station id                          | blank        | No station id                                                     |
-| 15       | Checksum                                           | *57          | Used by program to check for transmission errors                  |
+We will use the [picket library](https://github.com/sam-drew/picket) to check whether a point is in a zone. It receives a list of coordinates, and a point. The output will be true (if that point is in the zone drew from list coordinate) or false.
 
 ## Building the environment
 
@@ -77,6 +46,41 @@ Then, remove the containers and associated volumes by executing:
 ```shell
 $ docker-compose down -v
 ```
+
+## Understanding the application
+GPS data processing PoC in partnership with IoTeX, assuming that given GPS data input is trustworthy.</br>
+Concept:
+
+- Trusted vehicle “real-time” GPS data is sent as inputs and cross-referenced against public map datasets
+- If at any time the vehicle enters a toll zone or congestion zone, a notice is issued billing the vehicle owner for tolls
+
+
+The GPS data will use the format based on GPGGA (Global Positioning System Fix Data (Time, Position, Elevation))
+
+GPGGA is a commonplace format specified by the National Marine Electronics Association (NMEA. In addition to GPS receivers, it’s also used by echo sounder, sonars, anemometer, gyrocompass, and autopilot devices.)
+
+Example: `$GPGGA,170241.00,3401.21189,N,11824.67797,W,1,06,2.14,71.6,M,-32.9,M,,*57`
+
+Field Description:
+
+| Position | Field name                                         | Example data | Description                                                       |
+|----------|----------------------------------------------------|--------------|-------------------------------------------------------------------|
+| 0        | Sentence Type Identifier                           | $GPGGA       | GGA protocol header                                               |
+| 1        | Time                                               | 170241       | 17:02:41 UTC                                                      |
+| 2        | Latitude                                           | 3401.21189   | ddmm.mmmm format, converts to 34.020196 or 34d 1' 12.706" N       |
+| 3        | Latitude Hemisphere                                | N            | N = North, S = South                                              |
+| 4        | Longitude                                          | 11824.67797  | dddmm.mmmm format, converts to -118.41129833 or 118d 24' 48673" W |
+| 5        | Longitude Hemisphere                               | W            | W = West, E = East                                                |
+| 6        | - 0 = Invalid</br>- 1 = GPS fix</br>- 2 = DGPS fix | 1            | Data is from a GPS fix                                            |
+| 7        | Number of Satellites                               | 6            | 6 Satellites are in view                                          |
+| 8        | Horizontal Dilution of Precision (HDOP)            | 2.14         | Relative accuracy of horizontal position                          |
+| 9        | Altitude                                           | 71.6         | 71.6 meters above mean sea level                                  |
+| 10       | Altitude Units                                     | M            | M = meters                                                        |
+| 11       | Height of geoid above WGS84 ellipsoid              | -32.9        | -32.9 meters                                                      |
+| 12       | Height of geoid above WGS84 ellipsoid Units        | M            | M = meters                                                        |
+| 13       | Time since last DGPS update                        | blank        | No last update                                                    |
+| 14       | DGPS reference station id                          | blank        | No station id                                                     |
+| 15       | Checksum                                           | *57          | Used by program to check for transmission errors                  |
 
 ## Interacting with the application
 
