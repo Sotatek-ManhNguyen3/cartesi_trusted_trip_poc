@@ -17,6 +17,7 @@ DAPP_FS_BIN=/opt/cartesi/trusted-trip-dapp-fs/trusted-trip-dapp.ext2
 mkdir -p $DAPP_FS
 cp ./trusted-trip.py $DAPP_FS
 cp ./picket.py $DAPP_FS
+cp -r ./libs $DAPP_FS
 cp ./run.sh $DAPP_FS
 cp ./Airport_Runway_Protection_Zone_and_Inner_Safety_Zone.geojson $DAPP_FS
 genext2fs -f -i 512 -b 5120 -d $DAPP_FS $DAPP_FS_BIN

@@ -15,7 +15,7 @@ import logging
 import requests
 from flask import Flask, request
 import json
-import picket
+from libs import picket
 
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
