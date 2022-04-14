@@ -24,6 +24,42 @@ dispatcher_url = environ["HTTP_DISPATCHER_URL"]
 app.logger.info(f"HTTP dispatcher url is {dispatcher_url}")
 
 
+@app.route('/advance', methods=['POST'])
+def advance():
+    body = request.get_json("metadata")
+    print(f"Received advance request body {body}")
+
+    data = bytes.fromhex(body["payload"][2:])
+    data = data.decode().split(",")
+    print(data)
+    if len(data) != 15:
+        result = "Invalid GPS data"
+        add_notice(result)
+        finish()
+        return "", 202
+
+    is_toll_zone = is_in_the_toll_zone(data)
+
+    if is_toll_zone:
+        result = "You are in the toll zone. You need to pay the fee!!!"
+        address = body["metadata"]["msg_sender"]
+        add_voucher(address, result)
+    else:
+        result = "You are good"
+        add_notice(result)
+
+    print(result)
+    finish()
+    return "", 202
+
+
+@app.route('/inspect', methods=['GET'])
+def inspect(payload):
+    print('abcde')
+    print(f"Received inspect request payload {payload}")
+    return {"reports": [{"payload": payload}]}, 200
+
+
 def is_in_the_toll_zone(gps_data):
     latitude = float(gps_data[2][:2]) + float(gps_data[2][2:]) / 60
     longitude = float(gps_data[4][:2]) + float(gps_data[4][2:]) / 60
@@ -59,45 +95,28 @@ def create_fence(coordinates):
     return fence
 
 
-def call_back_to_rollup(result):
-    result = "0x" + result.encode().hex()
-    print("result in hex")
-    print(result)
+def to_hex(value):
+    return "0x" + value.encode().hex()
+
+
+def add_notice(message):
+    message = to_hex(message)
     print("Adding notice")
-    response = requests.post(dispatcher_url + "/notice", json={"payload": result})
+    response = requests.post(dispatcher_url + "/notice", json={"payload": message})
     print(f"Received notice status {response.status_code} body {response.json()}")
+    return True
+
+
+def add_voucher(address, message):
+    message = to_hex(message)
+    print("Adding voucher")
+    response = requests.post(dispatcher_url + "/voucher", json={"payload": message, "address": address})
+    print(f"Received voucher status {response.status_code}")
+    return True
+
+
+def finish():
     print("Finishing")
     response = requests.post(dispatcher_url + "/finish", json={"status": "accept"})
     print(f"Received finish status {response.status_code}")
-
-
-@app.route('/advance', methods=['POST'])
-def advance():
-    body = request.get_json("metadata")
-    print(f"Received advance request body {body}")
-
-    data = bytes.fromhex(body["payload"][2:])
-    data = data.decode().split(",")
-    print(data)
-    if len(data) != 15:
-        result = "Invalid GPS data"
-        call_back_to_rollup(result)
-        return "", 202
-
-    is_toll_zone = is_in_the_toll_zone(data)
-
-    if is_toll_zone:
-        result = "You are in the toll zone. You need to pay the fee!!!"
-    else:
-        result = "You are good"
-
-    print(result)
-    call_back_to_rollup(result)
-    return "", 202
-
-
-@app.route('/inspect', methods=['GET'])
-def inspect(payload):
-    print('abcde')
-    print(f"Received inspect request payload {payload}")
-    return {"reports": [{"payload": payload}]}, 200
+    return True
