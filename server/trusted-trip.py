@@ -38,7 +38,14 @@ def advance():
         finish()
         return "", 202
 
-    is_toll_zone = is_in_the_toll_zone(data)
+    try:
+        is_toll_zone = is_in_the_toll_zone(data)
+    except Exception as e:
+        result = "EXCEPTION: " + e.__str__()
+        print("NOTICE EXCEPTION" + e.__str__())
+        add_notice(result)
+        finish()
+        return "", 202
 
     if is_toll_zone:
         result = "You are in the toll zone. You need to pay the fee!!!"
@@ -55,7 +62,6 @@ def advance():
 
 @app.route('/inspect', methods=['GET'])
 def inspect(payload):
-    print('abcde')
     print(f"Received inspect request payload {payload}")
     return {"reports": [{"payload": payload}]}, 200
 
@@ -73,15 +79,28 @@ def is_in_the_toll_zone(gps_data):
         if zone['properties']['ZONE_TYPE'] != "Runway Protection Zone":
             continue
 
-        for inner_zone in zone['geometry']['coordinates']:
-            print('Inner zone')
-            print(len(inner_zone))
-            if len(inner_zone) < 3:
-                continue
+        if check_point_in_zone(zone['geometry']['coordinates'], latitude, longitude):
+            return True
 
-            fence = create_fence(inner_zone)
-            if fence.check_point((longitude, latitude)):
-                return True
+    return False
+
+
+def check_point_in_zone(gps_data, latitude, longitude):
+    print(gps_data[0][0])
+    if type(gps_data[0][0]) in (float, int):
+        if len(gps_data) < 3:
+            return False
+
+        fence = create_fence(gps_data)
+        if fence.check_point((latitude, longitude)):
+            return True
+
+        return False
+
+    for inner_zone in gps_data:
+        is_in_zone = check_point_in_zone(inner_zone, latitude, longitude)
+        if is_in_zone:
+            return True
 
     return False
 

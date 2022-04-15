@@ -2953,6 +2953,29 @@
           ]
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "OBJECTID": 498,
+        "AIRPORTS_R": 3,
+        "AIRPORTS_1": 0,
+        "ZONE_TYPE": "Runway Protection Zone",
+        "ZONE_TYPE_2": null,
+        "AIRPORT_NAME": "Fox Airfield new"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [1, 2],
+              [1, 9],
+              [7, 4]
+            ]
+          ]
+        ]
+      }
     }
   ]
 }
