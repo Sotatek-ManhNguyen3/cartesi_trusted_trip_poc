@@ -114,3 +114,15 @@ There are three possible results:
 - Invalid GPS data (If the data sent by gps does not have the correct form)
 - You are good (If the location is not in the toll zone)
 - You are in the toll zone. You need to pay the fee!!! (If the location is in the toll zone)
+
+The input data that is in the zone:
+
+```shell
+$GPGGA,170241.00,0300.00,N,0500.00,W,1,06,2.14,71.6,M,-32.9,M,,*57
+```
+
+In hex
+
+```shell
+0x2447504747412C3137303234312E30302C303330302E30302C4E2C303530302E30302C572C312C30362C322E31342C37312E362C4D2C2D33322E392C4D2C2C2A3537
+```

@@ -86,7 +86,6 @@ def is_in_the_toll_zone(gps_data):
 
 
 def check_point_in_zone(gps_data, latitude, longitude):
-    print(gps_data[0][0])
     if type(gps_data[0][0]) in (float, int):
         if len(gps_data) < 3:
             return False
