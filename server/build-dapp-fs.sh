@@ -12,13 +12,13 @@
 # specific language governing permissions and limitations under the License.
 
 DAPP_FS=/opt/cartesi/trusted-trip-dapp-fs/trusted-trip-dapp
+DAPP_FS_TAR=/opt/cartesi/trusted-trip-dapp-fs/trusted-trip-dapp.tar
 DAPP_FS_BIN=/opt/cartesi/trusted-trip-dapp-fs/trusted-trip-dapp.ext2
 
 mkdir -p $DAPP_FS
 cp ./trusted-trip.py $DAPP_FS
-cp ./picket.py $DAPP_FS
 cp -r ./libs $DAPP_FS
-cp ./run.sh $DAPP_FS
 cp ./Airport_Runway_Protection_Zone_and_Inner_Safety_Zone.geojson $DAPP_FS
-genext2fs -f -i 512 -b 5120 -d $DAPP_FS $DAPP_FS_BIN
+(cd $DAPP_FS; tar --sort=name --mtime="2022-01-01" --owner=0 --group=0 --numeric-owner -cf $DAPP_FS_TAR trusted-trip.py libs Airport_Runway_Protection_Zone_and_Inner_Safety_Zone.geojson)
+genext2fs -f -i 512 -b 5120 -a $DAPP_FS_TAR $DAPP_FS_BIN
 truncate -s %4096 $DAPP_FS_BIN

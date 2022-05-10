@@ -3,10 +3,6 @@ version: '3'
 services:
   server_manager:
     container_name: host_server_manager
-    image: cartesi/host-server-manager:0.2.1
-    environment:
-      - DAPP_HTTP_ADDRESS=10.2.14.53
+    image: cartesi/host-server-manager:0.3.0
     ports:
       - "5004:5004"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
